@@ -186,7 +186,7 @@
   limit: 3000
   category: UI
   group: /ui
-- pattern: /force_password_change/**
+- pattern: /login/force_password_change/**
   limit: 3000
   category: UI
   group: /ui

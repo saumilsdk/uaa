@@ -52,7 +52,7 @@ public class UaaAuthenticationFailureHandlerTests {
     public void setup() throws Exception {
         failureHandler = new ExceptionMappingAuthenticationFailureHandler();
         Map<String, String> errorMap = new HashMap<>();
-        errorMap.put("org.cloudfoundry.identity.uaa.authentication.PasswordChangeRequiredException", "/force_password_change");
+        errorMap.put("org.cloudfoundry.identity.uaa.authentication.PasswordChangeRequiredException", "/login/force_password_change");
         errorMap.put("org.cloudfoundry.identity.uaa.authentication.MfaAuthenticationRequiredException", "/login/mfa/register");
         failureHandler.setExceptionMappings(errorMap);
         failureHandler = spy(failureHandler);
@@ -91,7 +91,7 @@ public class UaaAuthenticationFailureHandlerTests {
         assertNotNull(request.getSession().getAttribute(FORCE_PASSWORD_EXPIRED_USER));
         assertEquals(uaaAuthentication, request.getSession().getAttribute(FORCE_PASSWORD_EXPIRED_USER));
         validateCookie();
-        assertEquals("/force_password_change", response.getRedirectedUrl());
+        assertEquals("/login/force_password_change", response.getRedirectedUrl());
     }
 
     private void validateCookie() {

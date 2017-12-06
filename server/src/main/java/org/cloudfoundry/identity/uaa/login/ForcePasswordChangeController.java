@@ -56,14 +56,14 @@ public class ForcePasswordChangeController {
     @Qualifier("resetPasswordService")
     private ResetPasswordService resetPasswordService;
 
-    @RequestMapping(value="/force_password_change", method= GET)
+    @RequestMapping(value="/login/force_password_change", method= GET)
     public String forcePasswordChangePage(Model model) throws IOException {
         String email = ((UaaAuthentication)SecurityContextHolder.getContext().getAuthentication()).getPrincipal().getEmail();
         model.addAttribute("email", email);
         return "force_password_change";
     }
 
-    @RequestMapping(value="/force_password_change", method = POST)
+    @RequestMapping(value="/login/force_password_change", method = POST)
     public String handleForcePasswordChange(Model model,
                                             @RequestParam("password")  String password,
                                             @RequestParam("password_confirmation") String passwordConfirmation,
@@ -86,7 +86,7 @@ public class ForcePasswordChangeController {
         logger.debug(String.format("Successful password change for username:%s in zone:%s ",principal.getName(), IdentityZoneHolder.get().getId()));
         authentication.setRequiresPasswordChange(false);
         authentication.setAuthenticatedTime(System.currentTimeMillis());
-        return "redirect:/force_password_change_completed";
+        return "redirect:/login/force_password_change/completed";
     }
 
     public void setResetPasswordService(ResetPasswordService resetPasswordService) {

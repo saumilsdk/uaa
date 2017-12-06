@@ -17,13 +17,14 @@ public class PasswordChangeRequiredFilter extends OncePerRequestFilter {
 
     private final String redirectUri;
     private final AntPathRequestMatcher matcher;
-    private final AntPathRequestMatcher completed = new AntPathRequestMatcher("/force_password_change_completed");
+    private final AntPathRequestMatcher completed;
     private final RequestCache cache;
 
-    public PasswordChangeRequiredFilter(String redirectUri, RequestCache cache) {
+    public PasswordChangeRequiredFilter(String redirectUri, RequestCache cache, String completeUrl) {
         this.redirectUri = redirectUri;
         matcher = new AntPathRequestMatcher(redirectUri);
         this.cache = cache;
+        completed = new AntPathRequestMatcher(completeUrl);
     }
 
 

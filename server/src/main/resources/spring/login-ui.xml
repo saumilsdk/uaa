@@ -265,15 +265,16 @@
     </bean>
 
     <bean id="passwordChangeRequiredFilter" class="org.cloudfoundry.identity.uaa.authentication.PasswordChangeRequiredFilter">
-        <constructor-arg name="redirectUri" value="/force_password_change"/>
+        <constructor-arg name="redirectUri" value="/login/force_password_change"/>
         <constructor-arg name="cache" ref="clientRedirectStateCache"/>
+        <constructor-arg name="completeUrl" value="/login/force_password_change/completed"/>
     </bean>
 
     <http name="uiSecurity"
           use-expressions="true"
           authentication-manager-ref="zoneAwareAuthzAuthenticationManager"
           xmlns="http://www.springframework.org/schema/security">
-        <intercept-url pattern="/force_password_change/**" access="isFullyAuthenticated()"/>
+        <intercept-url pattern="/login/force_password_change/**" access="isFullyAuthenticated()"/>
         <intercept-url pattern="/reset_password**" access="isAnonymous()"/>
         <intercept-url pattern="/login/mfa/**" access="isFullyAuthenticated()"/>
         <intercept-url pattern="/create_account*" access="isAnonymous()"/>
@@ -317,7 +318,7 @@
                 <entry key="org.cloudfoundry.identity.uaa.authentication.AccountNotPreCreatedException"
                        value="/login?error=account_not_precreated"/>
                 <entry key="org.cloudfoundry.identity.uaa.authentication.PasswordChangeRequiredException"
-                       value="/force_password_change"/>
+                       value="/login/force_password_change"/>
                 <entry key="org.cloudfoundry.identity.uaa.authentication.MfaAuthenticationRequiredException"
                        value="/login/mfa/register"/>
             </map>

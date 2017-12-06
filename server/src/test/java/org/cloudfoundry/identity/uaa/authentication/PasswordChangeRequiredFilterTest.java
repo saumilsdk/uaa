@@ -41,8 +41,8 @@ public class PasswordChangeRequiredFilterTest {
     public void setup() {
         cache = mock(RequestCache.class);
         filter = new PasswordChangeRequiredFilter(
-            "/force_password_change",
-            cache
+            "/login/force_password_change",
+            cache, "/login/force_password_change/completed"
         );
 
         authentication = mock(UaaAuthentication.class);
@@ -83,13 +83,13 @@ public class PasswordChangeRequiredFilterTest {
         when(authentication.isRequiresPasswordChange()).thenReturn(true);
         filter.doFilterInternal(request, response, chain);
         verify(chain, never()).doFilter(any(), any());
-        verify(response, times(1)).sendRedirect("/force_password_change");
+        verify(response, times(1)).sendRedirect("/login/force_password_change");
         verify(cache, times(1)).saveRequest(any(), any());
     }
 
     @Test
     public void loading_change_password_page() throws Exception {
-        request.setPathInfo("/force_password_change");
+        request.setPathInfo("/login/force_password_change");
         request.setMethod(HttpMethod.GET.name());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
@@ -101,7 +101,7 @@ public class PasswordChangeRequiredFilterTest {
 
     @Test
     public void submit_change_password() throws Exception {
-        request.setPathInfo("/force_password_change");
+        request.setPathInfo("/login/force_password_change");
         request.setMethod(HttpMethod.POST.name());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
@@ -113,7 +113,7 @@ public class PasswordChangeRequiredFilterTest {
 
     @Test
     public void follow_completed_redirect() throws Exception {
-        request.setPathInfo("/force_password_change_completed");
+        request.setPathInfo("/login/force_password_change/completed");
         request.setMethod(HttpMethod.POST.name());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
@@ -128,7 +128,7 @@ public class PasswordChangeRequiredFilterTest {
         String location = "/oauth/authorize";
         SavedRequest savedRequest = getSavedRequest(location);
         when(cache.getRequest(any(), any())).thenReturn(savedRequest);
-        request.setPathInfo("/force_password_change_completed");
+        request.setPathInfo("/login/force_password_change/completed");
         request.setMethod(HttpMethod.POST.name());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
@@ -140,7 +140,7 @@ public class PasswordChangeRequiredFilterTest {
 
     @Test
     public void trying_access_force_password_page() throws Exception {
-        request.setPathInfo("/force_password_change");
+        request.setPathInfo("/login/force_password_change");
         SecurityContextHolder.getContext().setAuthentication(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
         when(authentication.isRequiresPasswordChange()).thenReturn(false);
@@ -152,14 +152,14 @@ public class PasswordChangeRequiredFilterTest {
 
     @Test
     public void trying_access_force_password_page_not_authenticated() throws Exception {
-        request.setPathInfo("/force_password_change");
+        request.setPathInfo("/login/force_password_change");
         filter.doFilterInternal(request, response, chain);
         verify(chain, times(1)).doFilter(same(request), same(response));
     }
 
     @Test
     public void completed_but_still_requires_change() throws Exception {
-        request.setPathInfo("/force_password_change_completed");
+        request.setPathInfo("/login/force_password_change/completed");
         request.setMethod(HttpMethod.POST.name());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
@@ -168,7 +168,7 @@ public class PasswordChangeRequiredFilterTest {
         filter.doFilterInternal(request, response, chain);
 
         verify(chain, never()).doFilter(any(), any());
-        verify(response, times(1)).sendRedirect("/force_password_change");
+        verify(response, times(1)).sendRedirect("/login/force_password_change");
 
 
     }

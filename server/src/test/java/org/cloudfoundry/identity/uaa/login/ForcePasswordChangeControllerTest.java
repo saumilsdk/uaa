@@ -65,7 +65,7 @@ public class ForcePasswordChangeControllerTest  extends TestClassNullifier {
     @Test
     public void testForcePasswordChange() throws Exception {
         setAuthentication();
-        mockMvc.perform(get("/force_password_change"))
+        mockMvc.perform(get("/login/force_password_change"))
             .andExpect(status().isOk())
             .andExpect(view().name("force_password_change"))
             .andExpect(model().attribute("email", "mail"));
@@ -82,7 +82,7 @@ public class ForcePasswordChangeControllerTest  extends TestClassNullifier {
     @Test
     public void testRedirectToLogInIfPasswordIsNotExpired() throws Exception {
         setAuthentication();
-        mockMvc.perform(get("/force_password_change"))
+        mockMvc.perform(get("/login/force_password_change"))
             .andExpect(status().isOk())
             .andExpect(view().name("force_password_change"));
     }
@@ -92,12 +92,12 @@ public class ForcePasswordChangeControllerTest  extends TestClassNullifier {
     public void testHandleForcePasswordChange() throws Exception {
         setAuthentication();
         mockMvc.perform(
-            post("/uaa/force_password_change")
+            post("/uaa/login/force_password_change")
                 .param("password","pwd")
                 .param("password_confirmation", "pwd")
                 .contextPath("/uaa"))
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl("/uaa/force_password_change_completed"));
+                .andExpect(redirectedUrl("/uaa/login/force_password_change/completed"));
         verify(authentication, times(1)).setAuthenticatedTime(anyLong());
     }
 
@@ -105,11 +105,11 @@ public class ForcePasswordChangeControllerTest  extends TestClassNullifier {
     public void testHandleForcePasswordChangeWithRedirect() throws Exception {
         setAuthentication();
         mockMvc.perform(
-            post("/force_password_change")
+            post("/login/force_password_change")
                 .param("password","pwd")
                 .param("password_confirmation", "pwd"))
             .andExpect(status().isFound())
-            .andExpect(redirectedUrl("/force_password_change_completed"));
+            .andExpect(redirectedUrl("/login/force_password_change/completed"));
     }
 
     @Test
@@ -117,7 +117,7 @@ public class ForcePasswordChangeControllerTest  extends TestClassNullifier {
         setAuthentication();
         when(resourcePropertySource.getProperty("force_password_change.form_error")).thenReturn("Passwords must match and not be empty.");
         mockMvc.perform(
-            post("/force_password_change")
+            post("/login/force_password_change")
                 .param("password","pwd")
                 .param("password_confirmation", "nopwd"))
             .andExpect(status().isUnprocessableEntity());

@@ -81,12 +81,12 @@ public class ForcePasswordChangeControllerMockMvcTest extends InjectedMockContex
         getMockMvc().perform(get("/")
             .session(session))
             .andExpect(status().isFound())
-            .andExpect(redirectedUrl("/force_password_change"));
+            .andExpect(redirectedUrl("/login/force_password_change"));
 
         assertTrue(getUaaAuthentication(session).isAuthenticated());
         assertTrue(getUaaAuthentication(session).isRequiresPasswordChange());
 
-        MockHttpServletRequestBuilder validPost = post("/force_password_change")
+        MockHttpServletRequestBuilder validPost = post("/login/force_password_change")
             .param("password", "test")
             .param("password_confirmation", "test")
             .session(session)
@@ -94,11 +94,11 @@ public class ForcePasswordChangeControllerMockMvcTest extends InjectedMockContex
         validPost.with(cookieCsrf());
         getMockMvc().perform(validPost)
             .andExpect(status().isFound())
-            .andExpect(redirectedUrl(("/force_password_change_completed")));
+            .andExpect(redirectedUrl(("/login/force_password_change/completed")));
         assertTrue(getUaaAuthentication(session).isAuthenticated());
         assertFalse(getUaaAuthentication(session).isRequiresPasswordChange());
 
-        getMockMvc().perform(get("/force_password_change_completed")
+        getMockMvc().perform(get("/login/force_password_change/completed")
             .session(session))
             .andExpect(status().isFound())
             .andExpect(redirectedUrl("http://localhost/"));
@@ -134,7 +134,7 @@ public class ForcePasswordChangeControllerMockMvcTest extends InjectedMockContex
             getMockMvc().perform(invalidPost)
                 .andExpect(status().isFound());
 
-            MockHttpServletRequestBuilder validPost = post("/force_password_change")
+            MockHttpServletRequestBuilder validPost = post("/login/force_password_change")
                 .param("password", "test")
                 .param("password_confirmation", "test")
                 .session(session)
@@ -179,9 +179,9 @@ public class ForcePasswordChangeControllerMockMvcTest extends InjectedMockContex
                 .session(session)
             )
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl("/force_password_change"));
+                .andExpect(redirectedUrl("/login/force_password_change"));
 
-            MockHttpServletRequestBuilder validPost = post("/force_password_change")
+            MockHttpServletRequestBuilder validPost = post("/login/force_password_change")
                 .param("password", "test")
                 .param("password_confirmation", "test")
                 .session(session)
@@ -190,9 +190,9 @@ public class ForcePasswordChangeControllerMockMvcTest extends InjectedMockContex
 
             getMockMvc().perform(validPost)
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl(("/force_password_change_completed")));
+                .andExpect(redirectedUrl(("/login/force_password_change/completed")));
 
-            getMockMvc().perform(get("/force_password_change_completed")
+            getMockMvc().perform(get("/login/force_password_change/completed")
                 .session(session))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("http://localhost/"));
@@ -211,7 +211,7 @@ public class ForcePasswordChangeControllerMockMvcTest extends InjectedMockContex
     public void submit_password_change_when_not_authenticated() throws Exception {
         forcePasswordChangeForUser();
 
-        MockHttpServletRequestBuilder validPost = post("/force_password_change")
+        MockHttpServletRequestBuilder validPost = post("/login/force_password_change")
                 .param("password", "test")
                 .param("password_confirmation", "test");
         validPost.with(cookieCsrf());
