@@ -31,12 +31,16 @@ import java.util.Date;
 import static org.cloudfoundry.identity.uaa.mock.util.MockMvcUtils.CookieCsrfPostProcessor.cookieCsrf;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.startsWith;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -105,6 +109,45 @@ public class ForcePasswordChangeControllerMockMvcTest extends InjectedMockContex
         assertTrue(getUaaAuthentication(session).isAuthenticated());
         assertFalse(getUaaAuthentication(session).isRequiresPasswordChange());
 
+    }
+
+    @Test
+    public void force_password_use_old_password() throws Exception {
+        forcePasswordChangeForUser();
+        MockHttpSession session = new MockHttpSession();
+
+        MockHttpServletRequestBuilder invalidPost = post("/login.do")
+            .param("username", user.getUserName())
+            .param("password", "secret")
+            .session(session)
+            .with(cookieCsrf())
+            .param(CookieBasedCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME, "csrf1");
+        getMockMvc().perform(invalidPost)
+            .andExpect(status().isFound())
+            .andExpect(redirectedUrl("/"))
+            .andExpect(currentUserCookie(user.getId()));
+
+        assertTrue(getUaaAuthentication(session).isAuthenticated());
+        assertTrue(getUaaAuthentication(session).isRequiresPasswordChange());
+
+        getMockMvc().perform(get("/")
+            .session(session))
+            .andExpect(status().isFound())
+            .andExpect(redirectedUrl("/login/force_password_change"));
+
+        assertTrue(getUaaAuthentication(session).isAuthenticated());
+        assertTrue(getUaaAuthentication(session).isRequiresPasswordChange());
+
+        MockHttpServletRequestBuilder validPost = post("/login/force_password_change")
+            .param("password", "secret")
+            .param("password_confirmation", "secret")
+            .session(session)
+            .with(cookieCsrf());
+        validPost.with(cookieCsrf());
+        getMockMvc().perform(validPost)
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(view().name("force_password_change"))
+            .andExpect(model().attribute("message", "Your new password cannot be the same as the old password."));
     }
 
     private UaaAuthentication getUaaAuthentication(HttpSession session) {
