@@ -14,6 +14,7 @@ package org.cloudfoundry.identity.uaa.integration.feature;
 
 import org.cloudfoundry.identity.uaa.ServerRunning;
 import org.cloudfoundry.identity.uaa.account.UserAccountStatus;
+import org.cloudfoundry.identity.uaa.integration.util.IntegrationTestUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -123,6 +124,7 @@ public class ForcedPasswordChangeIT {
         webDriver.findElement(By.name("password_confirmation")).sendKeys("secr3T");
         webDriver.findElement(By.xpath("//input[@value='Create new password']")).click();
         assertEquals(baseUrl+"/login/force_password_change", webDriver.getCurrentUrl());
+        IntegrationTestUtils.takeScreenShot(webDriver);
         assertThat(webDriver.findElement(By.cssSelector(".error-message")).getText(),
             containsString("Your new password cannot be the same as the old password."));
     }
@@ -134,6 +136,7 @@ public class ForcedPasswordChangeIT {
         webDriver.findElement(By.name("password_confirmation")).sendKeys("invalid");
         webDriver.findElement(By.xpath("//input[@value='Create new password']")).click();
         assertEquals(baseUrl+"/login/force_password_change", webDriver.getCurrentUrl());
+        IntegrationTestUtils.takeScreenShot(webDriver);
         assertThat(webDriver.findElement(By.cssSelector(".error-message")).getText(),
             containsString("Passwords must match and not be empty."));
     }
@@ -144,6 +147,7 @@ public class ForcedPasswordChangeIT {
         webDriver.findElement(By.name("password")).sendKeys("newsecr3T");
         webDriver.findElement(By.xpath("//input[@value='Create new password']")).click();
         assertEquals(baseUrl+"/login/force_password_change", webDriver.getCurrentUrl());
+        IntegrationTestUtils.takeScreenShot(webDriver);
         assertThat(webDriver.findElement(By.cssSelector(".error-message")).getText(),
             containsString("Passwords must match and not be empty."));
     }
@@ -170,6 +174,7 @@ public class ForcedPasswordChangeIT {
         webDriver.findElement(By.name("password_confirmation")).sendKeys(invalidNewPassword);
         webDriver.findElement(By.xpath("//input[@value='Create new password']")).click();
         assertEquals(baseUrl+"/login/force_password_change", webDriver.getCurrentUrl());
+        IntegrationTestUtils.takeScreenShot(webDriver);
         assertThat(webDriver.findElement(By.cssSelector(".error-message")).getText(),
             containsString("Password must be no more than 255 characters in length."));
     }
